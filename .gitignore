@@ -1,0 +1,16 @@
+# Machine-specific overrides and secrets belong outside this repository.
+*.local
+*.local.*
+secrets/
+
+# Editor and operating-system generated files.
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OpenCode dependencies and dated configuration backups are reproducible or stale.
+opencode/node_modules/
+opencode/opencode.json.bak-*
+opencode/.env
+opencode/.env.*
