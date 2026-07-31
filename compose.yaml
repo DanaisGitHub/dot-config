@@ -1,0 +1,46 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Containerfile
+      args:
+        USER_UID: ${DEV_UID:-1000}
+        USER_GID: ${DEV_GID:-1000}
+        OPENCODE_VERSION: ${OPENCODE_VERSION:-latest}
+
+    container_name: dev-workspace
+    hostname: dev-workspace
+    restart: unless-stopped
+
+    init: true
+    stdin_open: true
+    tty: true
+
+    working_dir: /workspace
+
+    environment:
+      HOME: /home/dev
+      EDITOR: nvim
+      VISUAL: nvim
+      TERM: ${TERM:-xterm-256color}
+
+    volumes:
+      # Persists Neovim plugins, tmux plugins, and OpenCode authentication.
+      - type: volume
+        source: dev-home
+        target: /home/dev
+
+      # The Git-managed configuration is available live inside the container.
+      - type: bind
+        source: ${HOME}/dotfiles
+        target: /home/dev/dotfiles
+
+      # Project files persist on the VPS outside the container.
+      - type: bind
+        source: ${HOME}/projects
+        target: /workspace
+
+    command: ["sleep", "infinity"]
+
+volumes:
+  dev-home:
