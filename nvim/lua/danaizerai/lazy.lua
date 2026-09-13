@@ -10,6 +10,17 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- The pinned opencode.nvim integration uses the V1 server API. For V2,
+-- retain a terminal toggle without calling its incompatible HTTP endpoints.
+local opencode_v2 = vim.fn.executable("opencode") == 1
+  and vim.fn.system({ "opencode", "--version" }):match("opencode v2%.") ~= nil
+if opencode_v2 then
+  vim.o.autoread = true
+  vim.keymap.set({ "n", "t" }, "<C-.>", function()
+    require("snacks").terminal.toggle("opencode")
+  end, { desc = "Toggle OpenCode V2" })
+end
+
 -- Plugin list
 require("lazy").setup({
   -- Telescope (fuzzy finder)
@@ -116,7 +127,7 @@ require("lazy").setup({
       statuscolumn = { enabled = false },
       words      = { enabled = false },
       input = {},
-      picker = {
+      picker = not opencode_v2 and {
         actions = {
           opencode_send = function(...) return require("opencode").snacks_picker_send(...) end,
         },
@@ -127,13 +138,14 @@ require("lazy").setup({
             },
           },
         },
-      },
+      } or {},
     },
   },
 
   -- opencode.nvim
   {
     'nickjvandyke/opencode.nvim',
+    cond = not opencode_v2,
     version = '*',
     config = function()
       vim.g.opencode_opts = {}
