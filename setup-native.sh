@@ -49,6 +49,7 @@ if [[ "$install_packages" == true ]]; then
         openssh-clients \
         tmux \
         neovim \
+        tree-sitter-cli \
         ripgrep \
         fd-find \
         fzf \
@@ -97,7 +98,8 @@ fi
 
 (cd "$repo_dir/opencode" && npm ci)
 
-# Install pinned Neovim plugins without updating the tracked lockfile.
-nvim --headless '+Lazy! install' '+qa'
+# Restore pinned plugins and wait for their matching parsers to finish installing.
+nvim --headless '+Lazy! restore' \
+    '+lua require("danaizerai.treesitter").install():wait(300000)' '+qa'
 
 printf '%s\n' 'Native development environment is ready.'

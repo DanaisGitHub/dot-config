@@ -43,24 +43,11 @@ require("lazy").setup({
   -- Treesitter (better syntax highlighting)
   {
     'nvim-treesitter/nvim-treesitter',
+    lazy = false,
     build = ':TSUpdate',
-    init = function(plugin)
-      vim.opt.rtp:prepend(plugin.dir .. '/runtime')
+    config = function()
+      require("danaizerai.treesitter").setup()
     end,
-    opts = {
-      ensure_installed = {
-        "c", "lua", "vim", "vimdoc", "query",
-        "javascript", "typescript", "python",
-        "rust", "go", "html", "css", "json",
-        "yaml", "markdown"
-      },
-      sync_install = false,
-      auto_install = true,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-      },
-    },
   },
   -- Harpoon (quick file navigation)
   {
@@ -142,7 +129,35 @@ require("lazy").setup({
     },
   },
 
-  -- opencode.nvim
+  -- Native editor chat through OpenCode's supported ACP protocol.
+  {
+    "olimorris/codecompanion.nvim",
+    tag = "v19.24.1",
+    cond = opencode_v2,
+    cmd = { "CodeCompanionChat", "CodeCompanionActions", "CodeCompanionCodeReview" },
+    dependencies = { "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      interactions = {
+        chat = {
+          adapter = {
+            name = "opencode",
+            -- Override per machine when using another provider (e.g. work WSL).
+            model = vim.env.OPENCODE_NVIM_MODEL or "openai/gpt-6-astra",
+          },
+        },
+      },
+    },
+    keys = {
+      { "<C-a>", "<cmd>CodeCompanionChat Toggle<cr>", mode = "n", desc = "Toggle OpenCode chat" },
+      { "<C-a>", "<cmd>CodeCompanionChat Add<cr>", mode = "x", desc = "Add selection to OpenCode chat" },
+      { "<C-x>", "<cmd>CodeCompanionActions<cr>", mode = { "n", "x" }, desc = "AI editor actions" },
+      { "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>", mode = { "n", "x" }, desc = "Toggle OpenCode chat" },
+      { "<leader>an", "<cmd>CodeCompanionChat<cr>", mode = { "n", "x" }, desc = "New OpenCode chat" },
+      { "<leader>as", "<cmd>CodeCompanionChat Add<cr>", mode = "x", desc = "Add selection to OpenCode chat" },
+    },
+  },
+
+  -- Retain the old integration only for machines still using V1.
   {
     'nickjvandyke/opencode.nvim',
     cond = not opencode_v2,

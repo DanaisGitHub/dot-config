@@ -48,13 +48,25 @@ changes, restart the client and, when needed, `opencode service restart`.
 
 The currently pinned `opencode.nvim` uses the V1 HTTP API and launches with a
 `--port` flag that is absent from V2's TUI. For V2, this configuration skips that
-plugin and its Snacks picker action. **Ctrl+.** instead toggles an ordinary
-OpenCode terminal using Snacks. The old Ctrl+A/Ctrl+X agent actions are not
-installed for V2; normal editor bindings remain available.
+plugin and its Snacks picker action. CodeCompanion v19.24.1 now provides native
+editor chat through the supported `opencode acp` protocol.
 
-This fallback does not automatically send selections or diagnostics. OpenCode
-beside Neovim in tmux also works without the editor API integration. Neovim's
-own language servers remain independent of OpenCode.
+- **Ctrl+A** in Normal mode toggles the existing editor chat.
+- **Ctrl+A** in Visual mode adds selected code to that chat.
+- **Ctrl+X** opens CodeCompanion's action palette.
+- **Space a c / a s / a n** provide chat-toggle, add-selection and new-chat bindings.
+- **Ctrl+.** toggles the separate OpenCode terminal using Snacks.
+
+Use `#{diagnostics}` or `#{diff}` in chat to attach editor context. Press `Esc`
+then `Enter` to submit a message. ACP chat is a separate conversation by default;
+use `/resume` for the adapter's session picker. OpenCode credentials remain in
+OpenCode, rather than being copied into Neovim configuration.
+
+The default model is `openai/gpt-6-astra`, overridable through
+`OPENCODE_NVIM_MODEL`. This config enables ACP chat, not CodeCompanion's separate
+HTTP-backed inline actions. Neovim's language servers remain independent of
+OpenCode. Treesitter now uses the rewritten plugin's installation API, with
+matching parsers and queries under Neovim's data-directory `site/`.
 
 ## Migration verification and backups
 
