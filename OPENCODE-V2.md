@@ -37,6 +37,10 @@ opencode auth login openai --method chatgpt-headless
 Complete the device login in a browser. Credentials and the session database
 remain machine-local and are not synchronized through this repository.
 
+If a just-started service reports `Integration not found: openai`, let its model
+catalog initialize with `opencode models`, then retry login against that same
+service. This first-start issue was observed during migration.
+
 V2 runs a shared background service by default. After later startup-time config
 changes, restart the client and, when needed, `opencode service restart`.
 
@@ -80,6 +84,22 @@ For rollback, stop all OpenCode clients and its V2 service, preserve any new V2
 work, then restore the original executable, configuration and data from the same
 backup. Restore SQLite only with writers stopped and handle its WAL/SHM sidecars
 consistently. Replacing the executable alone does not reverse data migration.
+
+## Verified on 2026-09-13
+
+- Laptop: V2 executable installed; all 272 V1 sessions migrated in the isolated
+  database copy. Built-in ChatGPT OAuth, a Go edit/test/vet cycle, session resume,
+  and the Neovim terminal mapping passed. The live database switches on the first
+  V2 launch after the existing V1 clients are closed.
+- Hetzner development account (`ssh myvps-dev`): V2 installed, the old global
+  `opencode-ai` package removed, and both existing development-account sessions
+  migrated. ChatGPT was reauthenticated using device login. A Go edit/test/vet
+  cycle and session resume after a service restart passed; database quick-check
+  and Neovim startup passed.
+- A separately running root-owned V1 client predates this migration. Its process
+  is not the development account's V2 service. Development now uses `myvps-dev`.
+- Service configuration is machine-local and ignored by Git because it may
+  contain server credentials.
 
 ## References
 

@@ -14,3 +14,7 @@ opencode/node_modules/
 opencode/opencode.json.bak-*
 opencode/.env
 opencode/.env.*
+
+# V2 service settings are machine-local and can contain server credentials.
+opencode/service.json
+opencode/service.jsonc
